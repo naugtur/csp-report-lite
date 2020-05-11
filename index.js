@@ -1,14 +1,52 @@
-const { pipeline, Writable } = require("stream");
-const { safeMemoryCache } = require("safe-memory-cache");
-const storage = safeMemoryCache({ limit: 10000, maxTTL: 24 * 60 * 60 * 1000 });
+/**
+ * Aggregated Report
+ * @typedef {Object} AggregatedReport
+ * @property {string} key
+ * @property {number} count
+ * @property {Object} report
+ * @property {string} userAgent
+ */
 
-const log = console.log;
-const httpErr = (res, err) => {
-  log(err);
-  res.writeHead(500);
-  res.end("err");
-};
+/**
+ * Target Callback - the function accepting the aggregated report
+ * @callback TargetCallback
+ * @param {AggregatedReport} aggregatedReport
+ */
 
+/**
+ * Handler options
+ * @typedef {Object} HandlerOptions
+ * @property {number} maxBytes=50000
+ * @property {function} logger - logger function, defaults to console.log
+ * @property {TargetCallback} target - function accepting the aggregated report
+ * @property {number} cacheLimit=10000
+ * @property {number} cacheTTL=86400000
+ * @property {boolean} exponentialAggregation=true
+ */
+
+/**
+ * Aggregator options
+ * @typedef {Object} AggrOptions
+ * @property {TargetCallback} target - function accepting the aggregated report
+ * @property {number} cacheLimit=10000
+ * @property {number} cacheTTL=86400000
+ * @property {boolean} exponentialAggregation=true
+ */
+
+/**
+ * Request Handler
+ * @callback RequestHandler
+ * @param {Request} req
+ * @param {Response} res
+ */
+
+/**
+ * Accept Report
+ * @callback AcceptReport
+ * @param {ReportInput} reportInput
+ */
+
+ // TODO
 // { 'blocked-uri': 'eval',
 //   'column-number': 40017,
 //   'document-uri': 'https://',
@@ -19,62 +57,17 @@ const httpErr = (res, err) => {
 //   'source-file':
 //    'https://(..)/main.bundle.js',
 //   'violated-directive': 'script-src' }
-const compileKey = (r) =>
-  `vd:${r["violated-directive"]};
-  bu:${(r["blocked-uri"] || "-").split(":")[0]};
-  sf:${r["source-file"]};
-  pos:${r["line-number"]}/${r["column-number"]};
-  du:${r["document-uri"]}`;
-
-const isSpam = (r) => {
-  const sourceProto = r["source-file"] && r["source-file"].split(":")[0];
-  return sourceProto && sourceProto.includes("extension");
-};
-const acceptReport = (report, userAgent) => {
-  let key;
-  if (isSpam(report)) {
-    key = "spam";
-  } else {
-    key = compileKey(report);
-  }
-  let count = storage.get(key) || 0;
-  if (count % 10 === 0) {
-    log(key, "\n", count, report, userAgent);
-  }
-  count++;
-  storage.set(key, count);
-};
-
-module.exports = function (req, res) {
-  let body = "";
-  const writable = new Writable({
-    write(chunk, enc, cb) {
-      try {
-        body += chunk.toString();
-        if (body.length > 50000) {
-          throw Error("input body too long");
-        }
-        cb();
-      } catch (err) {
-        cb(err);
-      }
-    },
-  });
-
-  pipeline(req, writable, (err) => {
-    if (err) {
-      httpErr(res, err);
-    }
-    try {
-      const bodyObj = JSON.parse(body);
-      const userAgent = req.headers["user-agent"];
-      if (bodyObj && bodyObj["csp-report"]) {
-        acceptReport(bodyObj["csp-report"], userAgent);
-      }
-    } catch (e) {
-      httpErr(res, e);
-    }
-    res.writeHead(200);
-    res.end("ok");
-  });
+module.exports = {
+  /**
+   * requestHandler factory function
+   * @param  {HandlerOptions} options
+   * @returns {RequestHandler}
+   */
+  requestHandler: require("./src/requestHandler").requestHandler,
+  /**
+   * reportAggregator factory function
+   * @param  {AggrOptions} options
+   * @returns {AcceptReport}
+   */
+  reportAggregator: require("./src/report").reportAggregator,
 };
