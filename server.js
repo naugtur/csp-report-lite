@@ -9,8 +9,8 @@ http
       cacheTTL: 8000000,
       exponentialAggregation: true,
       logger: console.error,
-      target: console.log,
+      target: (rep) => console.log(JSON.stringify(rep)),
       maxBytes: 50000,
     })
   )
-  .listen(8000, console.log);
+  .listen(process.env.PORT || 8000, () => console.log("started"));
