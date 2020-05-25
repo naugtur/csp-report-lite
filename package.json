@@ -26,10 +26,11 @@
     "url": "https://github.com/naugtur/csp-report-lite/issues"
   },
   "main": "index.js",
-  "typings": "./index.d.ts",
+  "typings":"./index.d.ts",
   "files": [
     "src",
-    "index.js"
+    "index.js",
+    "index.d.ts"
   ],
   "homepage": "https://github.com/naugtur/csp-report-lite#readme"
 }
