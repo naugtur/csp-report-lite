@@ -1,11 +1,14 @@
 const { pipeline, Writable } = require("stream");
 const { reportAggregator } = require("./report");
 
+const defaultBeforeReport = (req) => ({ userAgent: req.headers["user-agent"] });
+
 module.exports = {
   requestHandler(options) {
     const maxBytes = options.maxBytes || 50000;
     const log = options.logger || console.log;
     const acceptReport = reportAggregator(options);
+    const beforeReport = options.beforeReport || defaultBeforeReport;
 
     const httpErr = (res, err) => {
       log(err);
@@ -14,6 +17,9 @@ module.exports = {
     };
 
     return function (req, res) {
+      if (req.method === "GET") {
+        return res.end();
+      }
       let body = "";
       const writable = new Writable({
         write(chunk, enc, cb) {
@@ -35,18 +41,18 @@ module.exports = {
         }
         try {
           const bodyObj = JSON.parse(body);
-          const userAgent = req.headers["user-agent"];
+          const customFields = beforeReport(req);
           if (bodyObj && bodyObj["csp-report"]) {
             acceptReport({
               report: bodyObj["csp-report"],
-              userAgent: userAgent,
+              customFields,
             });
           }
         } catch (e) {
           httpErr(res, e);
         }
         res.writeHead(200);
-        res.end("ok");
+        res.end();
       });
     };
   },
