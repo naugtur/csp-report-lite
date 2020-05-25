@@ -1,6 +1,6 @@
 {
   "name": "csp-report-lite",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "A lightweight sink (target) for Content Security Policy `report-uri` reporting that does initial filtering to hopefully report only as much as a human could reasonably read.",
   "dependencies": {
     "safe-memory-cache": "^2.0.0"
@@ -26,7 +26,7 @@
     "url": "https://github.com/naugtur/csp-report-lite/issues"
   },
   "main": "index.js",
-  "typings":"./index.d.ts",
+  "typings": "./index.d.ts",
   "files": [
     "src",
     "index.js"
