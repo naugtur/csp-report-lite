@@ -16,7 +16,12 @@ http
       cacheTTL: 8000000,
       exponentialAggregation: "default",
       logger: console.error,
-      target: (rep) => console.log(JSON.stringify(rep)),
+      target: (rep) => {
+        // key is really redundant the more verbose you go. Remove this line if you need to debug deduplication, 
+        //  other than that there's no point looking at long keys and you might as well set it to undefined.
+        rep.key = rep.key.substring(0,128);
+        console.log(JSON.stringify(rep));
+      },
       maxBytes: 50000,
     })
   )

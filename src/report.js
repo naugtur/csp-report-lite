@@ -14,32 +14,39 @@ const skipExtensions = (aggrFunction) => {
   };
 };
 
+const defaultAggregation = (r) =>
+  [
+    `vd:${r["violated-directive"]};`,
+    `bu:${(r["blocked-uri"] || "-")};`,
+    `sf:${r["source-file"] || "-"};`,
+    `pos:${r["line-number"] || "-"}/${r["column-number"] || "-"};`,
+    `du:${r["document-uri"]};`,
+  ].join("");
+
+
 const aggregations = {
   // verbosity: 5
   allUnique: (r) => JSON.stringify(r),
-  // verbosity: 4
+  // verbosity: very verbose and a bit heavy on memory
   uniqueNoExt: skipExtensions((r) => JSON.stringify(r)),
-  // verbosity: 3
-  allBlockedUris: skipExtensions((r) =>
-    [
-      `vd:${r["violated-directive"]};`,
-      `bu:${r["blocked-uri"] || "-"};`,
-      `sf:${r["source-file"]};`,
-      `pos:${r["line-number"]}/${r["column-number"]};`,
-      `du:${r["document-uri"]};`,
-    ].join("")
-  ),
-  // verbosity: 2
-  default: skipExtensions((r) =>
-    [
-      `vd:${r["violated-directive"]};`,
-      `bu:${(r["blocked-uri"] || "-").split(":")[0]};`,
-      `sf:${r["source-file"]};`,
-      `pos:${r["line-number"]}/${r["column-number"]};`,
-      `du:${r["document-uri"]};`,
-    ].join("")
-  ),
-  // verbosity: 1
+  // verbosity: default + details from browser extensions
+  withExtensions: defaultAggregation,
+  // verbosity: default + sepaarte entry for each different script loaded
+  defaultPlusSample: skipExtensions((r)=>defaultAggregation(r)+`ss:${r["script-sample"]};`),
+  // verbosity: default - heuristic to aggregate same violations together
+  default: skipExtensions(defaultAggregation),
+  // verbosity: same as default, but shows less repetitions for script/style violations across many urls
+  uniqueSample: skipExtensions((r) => {
+    if (r["script-sample"].length > 0) {
+      return [
+        `vd:${r["violated-directive"]};`,
+        `ss:${r["script-sample"]};`,
+      ].join("")
+    } else {
+      return defaultAggregation(r)
+    }
+  }),
+  // verbosity: lowest; sampling from each page
   sampleDirective: skipExtensions((r) =>
     [`vd:${r["violated-directive"]};`, `du:${r["document-uri"]};`].join("")
   ),
@@ -64,7 +71,6 @@ module.exports = {
     const isPowerOf10 = (num) => Math.log10(num) % 1 === 0;
 
     const acceptReport = ({ report, customFields }) => {
-      
       if (exponentialAggregation) {
         const key = compileKey(report);
         let count = storage.get(key) || 1;
