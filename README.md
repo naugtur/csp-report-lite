@@ -8,12 +8,16 @@ Surface:
 2. a request handler for a node server
 3. a report aggregator function for doing the logic
 
-More docs coming soon. Typings are available to explain more details
 
 ## Usage
 
 See usage example in server.js file
 
+### Report aggregation verbosity
+
+See https://github.com/naugtur/csp-report-lite/blob/master/src/report.js#L27-53
+
+More docs coming soon. Typings are available to explain more details
 ### API
 Docs generated using [`docts`](https://github.com/charto/docts)
 >
