@@ -20,11 +20,30 @@ module.exports = {
       if (req.method === "GET") {
         return res.end();
       }
+      if (req.method === "OPTIONS") {
+        // DOH https://bugs.chromium.org/p/chromium/issues/detail?id=1152867
+        res.setHeader("Access-Control-Allow-Origin", req.headers.origin || "*");
+        res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+        res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+        return res.end();
+      }
+
+      // Theoretically these are the only two contrnt types this should conume.
+      // Not sure if we can count on that always being the case
+      // contentType === "application/csp-report"
+      // contentType === "application/reports+json"
+
       let body = "";
       const writable = new Writable({
         write(chunk, enc, cb) {
           try {
-            body += chunk.toString();
+            const chunkString = chunk.toString();
+            if (body.length === 0) {
+              if (chunkString[0] !== "{") {
+                throw Error("input body not json");
+              }
+            }
+            body += chunkString;
             if (body.length > maxBytes) {
               throw Error("input body too long");
             }
@@ -38,6 +57,9 @@ module.exports = {
       pipeline(req, writable, (err) => {
         if (err) {
           httpErr(res, err);
+        }
+        if (!body.length) {
+          return res.end();
         }
         try {
           const bodyObj = JSON.parse(body);
