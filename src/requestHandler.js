@@ -74,12 +74,12 @@ module.exports = {
           const chunkString = chunk.toString();
           if (body.length === 0) {
             if (chunkString[0] !== "{") {
-              cb(Error("input body not json"));
+              return cb(Error("input body not json"));
             }
           }
           body += chunkString;
           if (body.length > maxBytes) {
-            cb(Error("input body too long"));
+            return cb(Error("input body too long"));
           }
           cb();
         },

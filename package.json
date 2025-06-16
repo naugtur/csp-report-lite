@@ -12,7 +12,8 @@
     "autocannon": "^8.0.0"
   },
   "scripts": {
-    "test": "npm start& node tools/tester.js",
+    "test": "./test/test.sh",
+    "test-manual": "npm start& node tools/tester.js",
     "start": "node server.js",
     "types": "tsc -b"
   },
