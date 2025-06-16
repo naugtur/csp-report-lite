@@ -1,5 +1,3 @@
-// @ts-check
-
 const http = require("http");
 
 const { requestHandler } = require("./");

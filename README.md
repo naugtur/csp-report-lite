@@ -24,7 +24,7 @@ Docs generated using [`docts`](https://github.com/charto/docts)
 > <a name="api-AggrOptions"></a>
 > ### Interface [`AggrOptions`](#api-AggrOptions)
 > <em>Aggregator options</em>  
-> Source code: [`<>`](http://github.com/naugtur/csp-report-lite/blob/master/index.d.ts#L37-L42)  
+> Source code: [`<>`](http://github.com/naugtur/csp-report-lite/blob/00b51a4/index.d.ts#L37-L42)  
 >  
 > Properties:  
 > > **.target** <sup><code>TargetCallback</code></sup>  
@@ -35,7 +35,7 @@ Docs generated using [`docts`](https://github.com/charto/docts)
 > <a name="api-HandlerOptions"></a>
 > ### Interface [`HandlerOptions`](#api-HandlerOptions)
 > <em>Handler options</em>  
-> Source code: [`<>`](http://github.com/naugtur/csp-report-lite/blob/master/index.d.ts#L23-L31)  
+> Source code: [`<>`](http://github.com/naugtur/csp-report-lite/blob/00b51a4/index.d.ts#L23-L31)  
 >  
 > Properties:  
 > > **.beforeReport** <sup><code>(req: any) =&gt; any</code></sup>  
@@ -48,13 +48,13 @@ Docs generated using [`docts`](https://github.com/charto/docts)
 >
 > <a name="api-reportAggregator"></a>
 > ### Function [`reportAggregator`](#api-reportAggregator)
-> Source code: [`<>`](http://github.com/naugtur/csp-report-lite/blob/master/index.d.ts#L58)  
-> > **reportAggregator( )** <sup>&rArr; <code>AcceptReport</code></sup> [`<>`](http://github.com/naugtur/csp-report-lite/blob/master/index.d.ts#L58)  
+> Source code: [`<>`](http://github.com/naugtur/csp-report-lite/blob/00b51a4/index.d.ts#L58)  
+> > **reportAggregator( )** <sup>&rArr; <code>AcceptReport</code></sup> [`<>`](http://github.com/naugtur/csp-report-lite/blob/00b51a4/index.d.ts#L58)  
 > > &emsp;&#x25aa; options <sup><code>[AggrOptions](#api-AggrOptions)</code></sup>  
 >
 > <a name="api-requestHandler"></a>
 > ### Function [`requestHandler`](#api-requestHandler)
 > <em>Request handler compatible with Node's http .reateServer</em>  
-> Source code: [`<>`](http://github.com/naugtur/csp-report-lite/blob/master/index.d.ts#L57)  
-> > **requestHandler( )** <sup>&rArr; <code>RequestListener</code></sup> [`<>`](http://github.com/naugtur/csp-report-lite/blob/master/index.d.ts#L57)  
+> Source code: [`<>`](http://github.com/naugtur/csp-report-lite/blob/00b51a4/index.d.ts#L57)  
+> > **requestHandler( )** <sup>&rArr; <code>any</code></sup> [`<>`](http://github.com/naugtur/csp-report-lite/blob/00b51a4/index.d.ts#L57)  
 > > &emsp;&#x25aa; options <sup><code>[HandlerOptions](#api-HandlerOptions)</code></sup>  

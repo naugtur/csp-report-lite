@@ -1,4 +1,4 @@
-FROM node:16-alpine
+FROM node:lts-alpine
 WORKDIR /code
 EXPOSE 8080
 COPY . /code

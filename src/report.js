@@ -1,10 +1,26 @@
+// @ts-expect-error no types there
 const { safeMemoryCache } = require("safe-memory-cache");
 
+/** @typedef {Object} ReportAggregatorOptions
+ * @property {number} [cacheLimit] - maximum number of reports to keep in memory
+ * @property {number} [cacheTTL] - time in milliseconds to keep reports in memory
+ * @property {keyof typeof aggregations} [exponentialAggregation] - aggregation strategy to use
+ * @property {(data: { key?: string, count?: number, report: Record<string, any>, [k: string]: any }) => void} [target] - function to call with the aggregated report
+ */
+
+/**
+ * @param {Record<string, any>} r CSP report object
+ * @returns {boolean}
+ */
 const isExtension = (r) => {
   const sourceProto = r["source-file"] && r["source-file"].split(":")[0];
   return sourceProto && sourceProto.includes("extension");
 };
 
+/**
+ * @param {(r: Record<string, any>) => string} aggrFunction
+ * @returns {(r: Record<string, any>) => string}
+ */
 const skipExtensions = (aggrFunction) => {
   return (r) => {
     if (isExtension(r)) {
@@ -14,16 +30,28 @@ const skipExtensions = (aggrFunction) => {
   };
 };
 
+/**
+ * @param {number} num
+ * @returns {boolean}
+ */
+const isPowerOf10 = (num) => Math.log10(num) % 1 === 0;
+
+/**
+ * @param {Record<string, any>} r CSP report object
+ * @returns {string}
+ */
 const defaultAggregation = (r) =>
   [
     `vd:${r["violated-directive"]};`,
-    `bu:${(r["blocked-uri"] || "-")};`,
+    `bu:${r["blocked-uri"] || "-"};`,
     `sf:${r["source-file"] || "-"};`,
     `pos:${r["line-number"] || "-"}/${r["column-number"] || "-"};`,
     `du:${r["document-uri"]};`,
   ].join("");
 
-
+/**
+ * @type {Record<string, (arg:Record<string,any>)=>string>}
+ */
 const aggregations = {
   // verbosity: 5
   allUnique: (r) => JSON.stringify(r),
@@ -32,7 +60,9 @@ const aggregations = {
   // verbosity: default + details from browser extensions
   withExtensions: defaultAggregation,
   // verbosity: default + sepaarte entry for each different script loaded
-  defaultPlusSample: skipExtensions((r)=>defaultAggregation(r)+`ss:${r["script-sample"]};`),
+  defaultPlusSample: skipExtensions(
+    (r) => defaultAggregation(r) + `ss:${r["script-sample"]};`
+  ),
   // verbosity: default - heuristic to aggregate same violations together
   default: skipExtensions(defaultAggregation),
   // verbosity: same as default, but shows less repetitions for script/style violations across many urls
@@ -41,9 +71,9 @@ const aggregations = {
       return [
         `vd:${r["violated-directive"]};`,
         `ss:${r["script-sample"]};`,
-      ].join("")
+      ].join("");
     } else {
-      return defaultAggregation(r)
+      return defaultAggregation(r);
     }
   }),
   // verbosity: lowest; sampling from each page
@@ -53,6 +83,9 @@ const aggregations = {
 };
 
 module.exports = {
+  /**
+   * @param {ReportAggregatorOptions} options
+   */
   reportAggregator({
     cacheLimit = 10000,
     cacheTTL = 24 * 60 * 60 * 1000,
@@ -68,8 +101,11 @@ module.exports = {
 
     const compileKey = aggregations[exponentialAggregation];
 
-    const isPowerOf10 = (num) => Math.log10(num) % 1 === 0;
-
+    /**
+     * @param {object} arg
+     * @param {Record<string, any>} arg.report
+     * @param {Record<string, any>} [arg.customFields]
+     */
     const acceptReport = ({ report, customFields }) => {
       if (exponentialAggregation) {
         const key = compileKey(report);
