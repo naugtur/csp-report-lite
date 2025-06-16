@@ -27,11 +27,11 @@
     "url": "https://github.com/naugtur/csp-report-lite/issues"
   },
   "main": "index.js",
-  "typings": "./index.d.ts",
+  "typings": "./types/index.d.ts",
   "files": [
     "src",
     "index.js",
-    "index.d.ts"
+    "types/index.d.ts"
   ],
   "homepage": "https://github.com/naugtur/csp-report-lite#readme",
   "lavamoat": {

@@ -21,6 +21,7 @@
     "skipLibCheck": true,
     "declaration": true,
     "declarationMap": false,
-    "emitDeclarationOnly": true
+    "emitDeclarationOnly": true,
+    "outFile": "./types/index.d.ts"
   }
 }
