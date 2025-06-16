@@ -1,6 +1,6 @@
 {
   "name": "csp-report-lite",
-  "version": "2.1.0",
+  "version": "3.0.0",
   "description": "A lightweight sink (target) for Content Security Policy `report-uri` reporting that does initial filtering to hopefully report only as much as a human could reasonably read.",
   "dependencies": {
     "safe-memory-cache": "^3.0.0"
